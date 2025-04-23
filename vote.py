@@ -9,16 +9,40 @@ from fake_useragent import UserAgent
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+# Basic stuff
+import yaml
+import random
+
 # Create a fake User Agent
 ua = UserAgent()
 user_agent = ua.random
-print(user_agent)
+print('Using AGENT: %s' % user_agent)
+
+# Functions
+def get_random_proxy():
+    _proxy_list = []
+    _proxy_strings = []
+    with open("proxy.yml") as stream:
+        try:
+            _proxy_list = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+
+    for proxy in _proxy_list:
+        if "sec" in proxy['Last Checked'] and "Germany" in proxy['Country']:
+            _proxy_strings.append(proxy['IP Address'] + ':' + proxy['Port'])
+        else:
+            continue
+    return random.choice(_proxy_strings)
 
 # set up chrome driver
+PROXY_STR = get_random_proxy()
+print('Using PROXY: %s' % PROXY_STR)
 service = Service(executable_path='/usr/lib/chromium-browser/chromedriver')
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
 options.add_argument(f'user-agent={user_agent}')
+options.add_argument('--proxy-server=%s' % PROXY_STR)
 driver = webdriver.Chrome(service=service, options=options)
 
 # Workaround for item not clickable
