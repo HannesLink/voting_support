@@ -3,16 +3,22 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
-import pprint
+from fake_useragent import UserAgent
 
 # For further enhancements
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+# Create a fake User Agent
+ua = UserAgent()
+user_agent = ua.random
+print(user_agent)
+
 # set up chrome driver
 service = Service(executable_path='/usr/lib/chromium-browser/chromedriver')
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
+options.add_argument(f'user-agent={user_agent}')
 driver = webdriver.Chrome(service=service, options=options)
 
 # Workaround for item not clickable
